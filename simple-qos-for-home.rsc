@@ -21,11 +21,9 @@
 # prio_4
     add chain=prerouting action=mark-packet new-packet-mark=prio_4 protocol=tcp port=3389
     add chain=prerouting action=mark-packet new-packet-mark=prio_4 protocol=tcp port=80,443
-# prio_5
-    add chain=prerouting action=mark-packet new-packet-mark=prio_5
 
 /queue tree add max-limit=$interfaceBandwidth name=QoS_global parent=global priority=1
-:for indexA from=1 to=5 do={
+:for indexA from=1 to=4 do={
    /queue tree add \ 
       name=( "prio_" . "$indexA" ) \
       parent=QoS_global \
@@ -34,6 +32,8 @@
       packet-mark=("prio_" . $indexA) \
       comment=("Priority " . $indexA . " traffic")
 }
+/queue tree add name="prio_5" parent=QoS_global priority=5 queue=ethernet-default \
+    packet-mark=no-mark comment="Priority 5 traffic"
 
 /ip firewall mangle
 # prio_1
